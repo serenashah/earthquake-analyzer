@@ -23,7 +23,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_a142c356a1d7496eee6474a3e1748baf {
+                #map_4941d2a8a578ee978592b639462eb226 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -38,13 +38,13 @@
 </head>
 <body>    
     
-            <div class="folium-map" id="map_a142c356a1d7496eee6474a3e1748baf" ></div>
+            <div class="folium-map" id="map_4941d2a8a578ee978592b639462eb226" ></div>
         
 </body>
 <script>    
     
-            var map_a142c356a1d7496eee6474a3e1748baf = L.map(
-                "map_a142c356a1d7496eee6474a3e1748baf",
+            var map_4941d2a8a578ee978592b639462eb226 = L.map(
+                "map_4941d2a8a578ee978592b639462eb226",
                 {
                     center: [0, 0],
                     crs: L.CRS.EPSG3857,
@@ -58,21 +58,21 @@
 
         
     
-            var tile_layer_ead69510c307269659e1c35c6abba0a6 = L.tileLayer(
+            var tile_layer_c586a829c6e0a805ca8f4a141317ff62 = L.tileLayer(
                 "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
                 {"attribution": "\u0026copy; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"http://cartodb.com/attributions\"\u003eCartoDB\u003c/a\u003e, CartoDB \u003ca href =\"http://cartodb.com/attributions\"\u003eattributions\u003c/a\u003e", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            ).addTo(map_a142c356a1d7496eee6474a3e1748baf);
+            ).addTo(map_4941d2a8a578ee978592b639462eb226);
         
     
-            var marker_cluster_e32bce41b9463ee98b3d835bd7b6f035 = L.markerClusterGroup(
+            var marker_cluster_b2e0c06f50a4968c70297d67ffd27cd8 = L.markerClusterGroup(
                 {}
             );
-            map_a142c356a1d7496eee6474a3e1748baf.addLayer(marker_cluster_e32bce41b9463ee98b3d835bd7b6f035);
+            map_4941d2a8a578ee978592b639462eb226.addLayer(marker_cluster_b2e0c06f50a4968c70297d67ffd27cd8);
         
     
-            var circle_marker_48294d7d63424583274b47971cca59b2 = L.circleMarker(
+            var circle_marker_d6cd221229c93787e53003d20f96f42f = L.circleMarker(
                 [19.2156658172607, 19.2156658172607],
                 {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(marker_cluster_e32bce41b9463ee98b3d835bd7b6f035);
+            ).addTo(marker_cluster_b2e0c06f50a4968c70297d67ffd27cd8);
         
 </script>
