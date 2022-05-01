@@ -1,4 +1,5 @@
-from flask import Flask
+#!/usr/bin/env python3
+from flask import Flask, request
 import json
 import csv
 app = Flask(__name__)
@@ -35,7 +36,7 @@ def specific_earthquake(num: int):
     '''
     print(json.dumps(eq_data['all_month'][num], indent = 1))
 
-@app.route('magnitude/<mag>', methods=['GET'])
+@app.route('/magnitude/<mag>', methods=['GET'])
 def big_earthquake(mag: int):
     '''
     prints earthquakes above some given magnitude

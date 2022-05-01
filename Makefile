@@ -1,6 +1,6 @@
-NAME=serenashah
+NAME?=serenashah
 
-all: build run
+all: stop build run
 
 images:
 	- docker images | grep ${NAME}
@@ -8,8 +8,10 @@ images:
 ps:
 	- docker ps -a | grep ${NAME}
 
+stop: 
+	docker stop ${NAME}-earthquake-api && docker rm -f ${NAME}-earthquake-api || true
 build:
 	docker build -t ${NAME}/earthquake-api:0.1 .
 
 run:
-	docker run --name "${NAME}-earthquake-api" -d -p 5028:5000 --rm -v \:/earthquake-api ${NAME}/earthquake-api:0.1
+	docker run --name "${NAME}-earthquake-api" -d -p 5028:5000 -v \:/earthquake-api ${NAME}/earthquake-api:0.1
