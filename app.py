@@ -1,9 +1,10 @@
 from flask import Flask
 import json
 import csv
-#app = Flask(__name__)
+app = Flask(__name__)
 eq_data = {'all_month':[]}
 
+@app.route('/download_data', methods=['POST'])
 def download_data():
     '''
     loads the data to dictionary of list of dict (easier to work w flask than list)
@@ -16,6 +17,7 @@ def download_data():
             eq_data['all_month'].append(dict(row))
     return json.dumps(eq_data, indent = 1)
 
+@app.route('/<id_string>', methods=['GET'])
 def specific_feature(id_string: str):
     '''
     prints a given feature for all earthquakes
@@ -25,6 +27,7 @@ def specific_feature(id_string: str):
     for x in eq_data['all_month']:
         print('[ID ' + x['id'] + f']: ' + x[id_string])
 
+@app.route('/earthquake/<num>', methods=['GET'])
 def specific_earthquake(num: int):
     '''
     prints all info abt a specific earthquake given # index
@@ -32,6 +35,7 @@ def specific_earthquake(num: int):
     '''
     print(json.dumps(eq_data['all_month'][num], indent = 1))
 
+@app.route('magnitude/<mag>', methods=['GET'])
 def big_earthquake(mag: int):
     '''
     prints earthquakes above some given magnitude
@@ -42,9 +46,4 @@ def big_earthquake(mag: int):
             print('[ID ' + x['id'] + ']: ' + x['mag'])
         
 if __name__ == '__main__':
-    #app.run(debug=True, host = '0.0.0.0'
-    download_data()
-    #print(download_data)
-    specific_feature('type')
-    specific_earthquake(0)
-    big_earthquake(6)
+    app.run(debug=True, host = '0.0.0.0')
