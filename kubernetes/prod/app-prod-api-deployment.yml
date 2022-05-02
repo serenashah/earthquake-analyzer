@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: earthquake-flask-deployment
+  labels:
+    app: earthquake-flask
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: earthquake-flask
+  template:
+    metadata:
+      labels:
+        app: earthquake-flask
+    spec:
+      containers:
+        - name: earthquake-flask
+          imagePullPolicy: Always
+          image: serenashah/earthquake-api:0.1
+          command: ['python3', 'app.py']
+          ports:
+          - name: http
+            containerPort: 5000

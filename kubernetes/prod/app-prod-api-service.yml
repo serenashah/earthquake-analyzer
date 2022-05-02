@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: earthquake-flask-service
+spec:
+  type: ClusterIP
+  selector:
+    app: earthquake-flask
+  ports:
+  - name: earthquake-flask
+    port: 5000
+    targetPort: 5000
