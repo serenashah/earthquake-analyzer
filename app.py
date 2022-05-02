@@ -16,17 +16,18 @@ def download_data():
         reader = csv.DictReader(f)
         for row in reader:
             eq_data['all_month'].append(dict(row))
-    return json.dumps(eq_data, indent = 1)
+    return 'Data has been loaded.\n'
 
-@app.route('/<id_string>', methods=['GET'])
+@app.route('/feature/<id_string>', methods=['GET'])
 def specific_feature(id_string: str):
     '''
     prints a given feature for all earthquakes
     we probably should make these return lists/strings/dicts in the future
     '''
-    print(f'All Earthquake {str}s')
+    string_list = []
     for x in eq_data['all_month']:
-        print('[ID ' + x['id'] + f']: ' + x[id_string])
+        string_list.append('[ID ' + x['id'] + f']: ' + x[id_string])
+    return(f'All Earthquake {id_string}s\n' + json.dumps(string_list, indent = 1)+ '\n')
 
 @app.route('/earthquake/<num>', methods=['GET'])
 def specific_earthquake(num: int):
@@ -34,17 +35,18 @@ def specific_earthquake(num: int):
     prints all info abt a specific earthquake given # index
     really we should do one by ID maybe?
     '''
-    print(json.dumps(eq_data['all_month'][num], indent = 1))
+    return(f'Earthquake {num}\n' + json.dumps(eq_data['all_month'][int(num)], indent = 1) + '\n')
 
 @app.route('/magnitude/<mag>', methods=['GET'])
 def big_earthquake(mag: int):
     '''
     prints earthquakes above some given magnitude
     '''
-    print(f'Magnitudes above {mag}\n')
+    magnitude_list = []
     for x in eq_data['all_month']:
-        if float(x['mag']) >= mag:
-            print('[ID ' + x['id'] + ']: ' + x['mag'])
-        
+        if float(x['mag']) >= int(mag):
+            magnitude_list.append('[ID ' + x['id'] + ']: ' + x['mag'])
+    return(f'Magnitudes above {mag}\n' + json.dumps(magnitude_list, indent = 1) + '\n')
+
 if __name__ == '__main__':
     app.run(debug=True, host = '0.0.0.0')
