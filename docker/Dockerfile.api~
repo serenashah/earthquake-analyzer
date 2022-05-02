@@ -1,0 +1,20 @@
+FROM centos:7.9.2009
+
+RUN yum update -y && \
+    yum install -y python3
+
+RUN mkdir /app
+WORKDIR /app
+COPY requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
+
+COPY /src/all_month.csv /app
+COPY /src/app.py /app
+
+ENTRYPOINT ["python3"]
+CMD ["app.py"]
+
+ENV LC_CTYPE=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8  
+ENV LANGUAGE=en_US.UTF-8
+ENV LANG=en_US.UTF-8  
