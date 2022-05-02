@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: earthquake-db-deployment
+  labels:
+    app: earthquake-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: earthquake-db
+  template:
+    metadata:
+      labels:
+        app: earthquake-db
+    spec:
+      containers:
+        - name: earthquake-db
+          image: redis:6
+          ports:
+          - name: http
+            containerPort: 6379	  
+          volumeMounts:	 
+            - name: earthquake-data
+              mountPath: "/data"
+      volumes:
+      - name: earthquake-data
+        persistentVolumeClaim:
+          claimName: earthquake-data
