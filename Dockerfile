@@ -5,7 +5,7 @@ RUN yum update -y && \
 
 RUN pip3 install --user Flask==2.0.3
 RUN pip3 install --user redis
-
+RUN pip3 install --user pytest
 
 RUN mkdir /app
 WORKDIR /app
