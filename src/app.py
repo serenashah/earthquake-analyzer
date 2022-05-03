@@ -18,24 +18,26 @@ def download_data():
             eq_data['all_month'].append(dict(row))
     return 'Data has been loaded.\n'
 
-@app.route('/feature/<id_string>', methods=['GET'])
-def specific_feature(id_string: str):
+@app.route('/feature/<feat_string>', methods=['GET'])
+def specific_feature(feat_string: str):
     '''
     prints a given feature for all earthquakes
     we probably should make these return lists/strings/dicts in the future
     '''
     string_list = []
     for x in eq_data['all_month']:
-        string_list.append('[ID ' + x['id'] + f']: ' + x[id_string])
-    return(f'All Earthquake {id_string}s\n' + json.dumps(string_list, indent = 1)+ '\n')
+        string_list.append('[ID ' + x['id'] + f']: ' + x[feat_string])
+    return(f'All Earthquake {feat_string}s\n' + json.dumps(string_list, indent = 1)+ '\n')
 
-@app.route('/earthquake/<num>', methods=['GET'])
-def specific_earthquake(num: int):
+@app.route('/earthquake/<id_num>', methods=['GET'])
+def specific_earthquake(id_num: str):
     '''
     prints all info abt a specific earthquake given # index
     really we should do one by ID maybe?
     '''
-    return(f'Earthquake {num}\n' + json.dumps(eq_data['all_month'][int(num)], indent = 1) + '\n')
+    for x in eq_data['all_month']:
+        if x['id'] == id_num:
+            return(f'Earthquake {id_num}\n' + json.dumps(x, indent = 1) + '\n')
 
 @app.route('/magnitude/<mag>', methods=['GET'])
 def big_earthquake(mag: int):
