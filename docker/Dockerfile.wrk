@@ -5,6 +5,9 @@ RUN yum update -y && \
 
 RUN mkdir /app
 WORKDIR /app
+COPY requirements.txt /app/requirements.txt
+RUN pip3 install --user -r /app/requirements.txt
+
 COPY /src/app.py /app
 
 ENTRYPOINT ["python3"]
