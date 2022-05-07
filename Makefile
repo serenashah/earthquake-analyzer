@@ -1,6 +1,6 @@
 NAME?=serenashah
 
-all: api-stop api-build run-all
+all: stop-all build-all run-all
 
 images:
 	- docker images | grep ${NAME}
