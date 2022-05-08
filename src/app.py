@@ -71,13 +71,22 @@ def big_earthquake(mag: int):
             magnitude_list.append('[ID ' + rd.hget(item, 'id') + ']: ' + rd.hget(item, 'mag'))
     return(f'Magnitudes above {mag}\n' + json.dumps(magnitude_list, indent = 1) + '\n')
 
-@app.route('/delete/<id_num>/<feature_string>', methods =['DELETE'])
-def delete_feature(id_num: str, feature_string:str):
+@app.route('/delete/<id_num>', methods =['DELETE'])
+def delete_feature(id_num: str):
     feature_list = []
     for item in rd.keys():
         if rd.hget(item, 'id') == id_num:
-            rd.delete(item, feature_string)
-    return (f'Earthquake {id_num}-> {feature_string} DELETED.\n')
+            rd.delete(item)
+            return (f'Earthquake {id_num} DELETED.\n')
+
+@app.route('/update/<id_num>/<feature_string>/<new_value>', methods =['UPDATE'])
+def update_feature(id_num: str, feature_string:str, new_value:str):
+    feature_list = []
+    for item in rd.keys():
+        if rd.hget(item, 'id') == id_num:
+            rd.hset(item, feature_string, new_value)
+            return (f'Earthquake {id_num}-> {feature_string} UPDATED to {new_value}.\n')
+
 
 if __name__ == '__main__':
     app.run(debug=True, host = '0.0.0.0')
