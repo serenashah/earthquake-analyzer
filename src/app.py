@@ -23,7 +23,7 @@ def download_data():
                 eq_data['all_month'].append(dict(row))
             
         for item in eq_data['all_month']:
-            rd.set(item['id'], json.dumps(item))
+            rd.hset(item['id'], mapping = item)
 
         return 'Data has been loaded.\n'
 
@@ -32,7 +32,7 @@ def download_data():
         eq_list = []
         
         for item in rd.keys():
-            eq_list.append(json.loads(rd.get(item)))
+            eq_list.append(rd.hgetall(item))
         
         return (json.dumps(eq_list, indent = 2) + '\n')
 

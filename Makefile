@@ -29,18 +29,20 @@ db-build:
 	docker pull redis:6
 
 api-run:
-	RIP=$$(docker inspect ${NAME}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
-	docker run --name ${NAME}-earthquake-api --env REDIS_IP=${RIP} -d -p 5028:5000 ${NAME}/earthquake-api:0.1
+	RIP=$$(docker inspect ${NAME}-earthquake-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
+	docker run --name ${NAME}-earthquake-api --env REDIS_IP=$${RIP} -d -p 5028:5000 ${NAME}/earthquake-api:0.1
 
 worker-run:
-	RIP=$$(docker inspect ${NAME}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
-	docker run --name ${NAME}-earthquake-wrk --env REDIS_IP=${RIP} -d ${NAME}/earthquake-wrk:0.1
+	RIP=$$(docker inspect ${NAME}-earthquake-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
+	docker run --name ${NAME}-earthquake-wrk --env REDIS_IP=$${RIP} -d ${NAME}/earthquake-wrk:0.1
 
 db-run: db-build
-	docker run --name ${NAME}-earthquake-db -p 6428:6379 -d -u ${UID}:${GID} -v ${PWD}/src:/src redis:6
+	docker run --name ${NAME}-earthquake-db -p 6428:6379 -d -u ${UID}:${GID} -v ${PWD}/data:/data redis:6 --save 1 1
 
 stop-all: api-stop worker-stop db-stop
 
-build-all: api-build worker-build db-build
+build-all: db-build api-build worker-build
 
 run-all: db-run api-run worker-run
+
+cycle-api: api-stop api-build api-run

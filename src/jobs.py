@@ -5,15 +5,13 @@ from flask import Flask, request
 import redis
 from hotqueue import HotQueue
 
-
 redis_ip = os.environ.get('REDIS_IP')
 if not redis_ip:
     raise Exception()
 
-rd = redis.Redis(host=redis_ip, port=6379, db=0)
+rd = redis.Redis(host=redis_ip, port=6379, db=0, decode_responses=True)
 q = HotQueue("queue", host=redis_ip, port=6379, db=1)
 jdb = redis.Redis(host=redis_ip, port=6379, db=2, decode_responses=True)
-
 
 def _generate_jid():
     """
