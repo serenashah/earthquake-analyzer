@@ -30,7 +30,7 @@ db-build:
 
 api-run:
 	RIP=$$(docker inspect ${NAME}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
-	docker run --name ${NAME}-earthquake-api --env REDIS_IP=${RIP} -d -p 5028:5000 -v \:/earthquake-api ${NAME}/earthquake-api:0.1
+	docker run --name ${NAME}-earthquake-api --env REDIS_IP=${RIP} -d -p 5028:5000 ${NAME}/earthquake-api:0.1
 
 worker-run:
 	RIP=$$(docker inspect ${NAME}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
@@ -43,4 +43,4 @@ stop-all: api-stop worker-stop db-stop
 
 build-all: api-build worker-build db-build
 
-run-all: api-run worker-run db-run
+run-all: db-run api-run worker-run
