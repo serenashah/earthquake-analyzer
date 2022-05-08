@@ -46,8 +46,8 @@ def specific_feature(feat_string: str):
     we probably should make these return lists/strings/dicts in the future
     '''
     string_list = []
-    for x in eq_data['all_month']:
-        string_list.append('[ID ' + x['id'] + f']: ' + x[feat_string])
+    for item in rd.keys():
+        string_list.append('[ID ' + rd.hget(item, 'id') + ']: ' + rd.hget(item, feat_string))
     return(f'All Earthquake {feat_string}s\n' + json.dumps(string_list, indent = 1)+ '\n')
 
 @app.route('/earthquake/<id_num>', methods=['GET'])
