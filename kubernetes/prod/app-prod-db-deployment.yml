@@ -22,9 +22,9 @@ spec:
           - name: http
             containerPort: 6379	  
           volumeMounts:	 
-            - name: earthquake-data
+            - name: data
               mountPath: "/data"
       volumes:
-      - name: earthquake-data
+      - name: data
         persistentVolumeClaim:
-          claimName: earthquake-data
+          claimName: data

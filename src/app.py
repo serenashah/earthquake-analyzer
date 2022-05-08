@@ -6,7 +6,7 @@ from jobs import rd, q, add_job, get_job_by_id
 app = Flask(__name__)
 eq_data = {'all_month':[]}
 
-@app.route('/download_data', methods=['POST', 'GET'])
+@app.route('/data', methods=['POST', 'GET'])
 def download_data():
     '''
     loads the data to dictionary of list of dict (easier to work w flask than list)
@@ -46,8 +46,8 @@ def specific_feature(feat_string: str):
     we probably should make these return lists/strings/dicts in the future
     '''
     string_list = []
-    for x in eq_data['all_month']:
-        string_list.append('[ID ' + x['id'] + f']: ' + x[feat_string])
+    for item in rd.keys():
+        string_list.append('[ID ' + rd.hget(item, 'id') + ']: ' + rd.hget(item, feat_string))
     return(f'All Earthquake {feat_string}s\n' + json.dumps(string_list, indent = 1)+ '\n')
 
 @app.route('/earthquake/<id_num>', methods=['GET'])
@@ -56,9 +56,9 @@ def specific_earthquake(id_num: str):
     prints all info abt a specific earthquake given # index
     really we should do one by ID maybe?
     '''
-    for x in eq_data['all_month']:
-        if x['id'] == id_num:
-            return(f'Earthquake {id_num}\n' + json.dumps(x, indent = 1) + '\n')
+    for item in rd.keys():
+        if rd.hget(item, 'id') == id_num:
+            return(f'Earthquake {id_num}\n' + json.dumps(rd.hgetall(item), indent = 1) + '\n')
 
 @app.route('/magnitude/<mag>', methods=['GET'])
 def big_earthquake(mag: int):
@@ -66,10 +66,18 @@ def big_earthquake(mag: int):
     prints earthquakes above some given magnitude
     '''
     magnitude_list = []
-    for x in eq_data['all_month']:
-        if float(x['mag']) >= int(mag):
-            magnitude_list.append('[ID ' + x['id'] + ']: ' + x['mag'])
+    for item in rd.keys():
+        if float(rd.hget(item, 'mag')) >= int(mag):
+            magnitude_list.append('[ID ' + rd.hget(item, 'id') + ']: ' + rd.hget(item, 'mag'))
     return(f'Magnitudes above {mag}\n' + json.dumps(magnitude_list, indent = 1) + '\n')
+
+@app.route('/delete/<id_num>/<feature_string>', methods =['DELETE'])
+def delete_feature(id_num: str, feature_string:str):
+    feature_list = []
+    for item in rd.keys():
+        if rd.hget(item, 'id') == id_num:
+            rd.delete(item, feature_string)
+    return (f'Earthquake {id_num}-> {feature_string} DELETED.\n')
 
 if __name__ == '__main__':
     app.run(debug=True, host = '0.0.0.0')
