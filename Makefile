@@ -1,4 +1,6 @@
 NAME?=serenashah
+GID=816966
+UID=876392
 
 all: stop-all build-all run-all
 
@@ -12,13 +14,19 @@ api-stop:
 	docker stop ${NAME}-earthquake-api && docker rm -f ${NAME}-earthquake-api || true
 
 worker-stop:
-	docker stop ${NAME}-wrk && docker rm -f ${NAME}-earthquake-wrk || true
+	docker stop ${NAME}-earthquake-wrk && docker rm -f ${NAME}-earthquake-wrk || true
+
+db-stop:
+	docker stop ${NAME}-earthquake-db && docker rm -f ${NAME}-earthquake-db || true
 
 api-build:
 	docker build -t ${NAME}/earthquake-api:0.1 -f docker/Dockerfile.api . 
 
 worker-build:
 	docker build -t ${NAME}/earthquake-wrk:0.1 -f docker/Dockerfile.wrk .
+
+db-build:
+	docker pull redis:6
 
 api-run:
 	RIP=$$(docker inspect ${NAME}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
@@ -28,8 +36,11 @@ worker-run:
 	RIP=$$(docker inspect ${NAME}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') && \
 	docker run --name ${NAME}-earthquake-wrk --env REDIS_IP=${RIP} -d ${NAME}/earthquake-wrk:0.1
 
-stop-all: api-stop worker-stop
+db-run: db-build
+	docker run --name ${NAME}-earthquake-db -p 6428:6379 -d -u ${UID}:${GID} -v ${PWD}/src:/src redis:6
 
-build-all: api-build worker-build
+stop-all: api-stop worker-stop db-stop
 
-run-all: api-run worker-run
+build-all: api-build worker-build db-build
+
+run-all: api-run worker-run db-run
