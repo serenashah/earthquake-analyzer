@@ -2,21 +2,42 @@
 from flask import Flask, request
 import json
 import csv
+from jobs import rd, q, add_job, get_job_by_id
 app = Flask(__name__)
 eq_data = {'all_month':[]}
 
-@app.route('/download_data', methods=['POST'])
+@app.route('/download_data', methods=['POST', 'GET'])
 def download_data():
     '''
     loads the data to dictionary of list of dict (easier to work w flask than list)
     returns json-formatted
     '''
     global eq_data
-    with open('all_month.csv', 'r') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            eq_data['all_month'].append(dict(row))
-    return 'Data has been loaded.\n'
+    
+    if request.method == 'POST':
+        rd.flushdb()
+
+        with open('all_month.csv', 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                eq_data['all_month'].append(dict(row))
+            
+        for item in eq_data['all_month']:
+            rd.set(item['id'], json.dumps(item))
+
+        return 'Data has been loaded.\n'
+
+    elif request.method == 'GET':
+        
+        eq_list = []
+        
+        for item in rd.keys():
+            eq_list.append(json.loads(rd.get(item)))
+        
+        return (json.dumps(eq_list, indent = 2) + '\n')
+
+    else:
+        return "Only supports POST and GET methods.\n"
 
 @app.route('/feature/<feat_string>', methods=['GET'])
 def specific_feature(feat_string: str):

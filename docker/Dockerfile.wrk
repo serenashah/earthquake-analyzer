@@ -9,9 +9,10 @@ COPY requirements.txt /app/requirements.txt
 RUN pip3 install --user -r /app/requirements.txt
 
 COPY /src/app.py /app
+COPY /src/jobs.py /app
 
 ENTRYPOINT ["python3"]
-CMD ["app.py"]
+CMD ["worker.py"]
 
 ENV LC_CTYPE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8  

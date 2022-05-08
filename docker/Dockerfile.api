@@ -10,6 +10,7 @@ RUN pip3 install --user -r /app/requirements.txt
 
 COPY /src/all_month.csv /app
 COPY /src/app.py /app
+COPY /src/jobs.py /app
 
 ENTRYPOINT ["python3"]
 CMD ["app.py"]

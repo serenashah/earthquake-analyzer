@@ -19,7 +19,9 @@ spec:
         - name: earthquake-flask
           imagePullPolicy: Always
           image: serenashah/earthquake-api:0.1
-          command: ['python3', 'app.py']
           ports:
           - name: http
             containerPort: 5000
+	- name: earthquake-worker
+	  imagePullPolicy: Always
+	  image: serenashah/earthquake-worker:0.1
