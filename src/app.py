@@ -56,9 +56,9 @@ def specific_earthquake(id_num: str):
     prints all info abt a specific earthquake given # index
     really we should do one by ID maybe?
     '''
-    for x in eq_data['all_month']:
-        if x['id'] == id_num:
-            return(f'Earthquake {id_num}\n' + json.dumps(x, indent = 1) + '\n')
+    for item in rd.keys():
+        if rd.hget(item, 'id') == id_num:
+            return(f'Earthquake {id_num}\n' + json.dumps(rd.hgetall(item), indent = 1) + '\n')
 
 @app.route('/magnitude/<mag>', methods=['GET'])
 def big_earthquake(mag: int):
@@ -66,9 +66,9 @@ def big_earthquake(mag: int):
     prints earthquakes above some given magnitude
     '''
     magnitude_list = []
-    for x in eq_data['all_month']:
-        if float(x['mag']) >= int(mag):
-            magnitude_list.append('[ID ' + x['id'] + ']: ' + x['mag'])
+    for item in rd.keys():
+        if float(rd.hget(item, 'mag')) >= int(mag):
+            magnitude_list.append('[ID ' + rd.hget(item, 'id') + ']: ' + rd.hget(item, 'mag'))
     return(f'Magnitudes above {mag}\n' + json.dumps(magnitude_list, indent = 1) + '\n')
 
 if __name__ == '__main__':
