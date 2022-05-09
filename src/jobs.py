@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 import uuid
@@ -11,7 +12,7 @@ if not redis_ip:
 
 rd = redis.Redis(host=redis_ip, port=6379, db=0, decode_responses=True)
 q = HotQueue("queue", host=redis_ip, port=6379, db=1)
-jdb = redis.Redis(host=redis_ip, port=6379, db=2)
+jdb = redis.Redis(host=redis_ip, port=6379, db=2, decode_responses=True)
 
 def _generate_jid():
     """
@@ -26,21 +27,23 @@ def _generate_job_key(jid):
     """
     return 'job.{}'.format(jid)
 
-def _instantiate_job(jid, status, start, end):
+def _instantiate_job(jid, status, min_mag, max_mag):
     """
     Create the job object description as a python dictionary. Requires the job id, status,
     start and end parameters.
     """
     if type(jid) == str:
         return {'id': jid,
+                'datetime': str(datetime.now()),
                 'status': status,
-                'start': start,
-                'end': end
+                'min_mag': min_mag,
+                'max_mag': max_mag
                }
     return {'id': jid.decode('utf-8'),
+            'datetime': str(datetime.now()),
             'status': status.decode('utf-8'),
-            'start': start.decode('utf-8'),
-            'end': end.decode('utf-8')
+            'min_mag': min_mag.decode('utf-8'),
+            'max_mag': max_mag.decode('utf-8')
            }
 
 def _save_job(job_key, job_dict):
@@ -53,10 +56,10 @@ def _queue_job(jid):
     q.put(jid)
     return
 
-def add_job(start, end, status="submitted"):
+def add_job(min_mag, max_mag, status="submitted"):
     """Add a job to the redis queue."""
     jid = _generate_jid()
-    job_dict = _instantiate_job(jid, status, start, end)
+    job_dict = _instantiate_job(jid, status, min_mag, max_mag)
     _save_job(_generate_job_key(jid), job_dict)
     _queue_job(jid)
     return job_dict

@@ -2,7 +2,7 @@
 from flask import Flask, request
 import json
 import csv
-from jobs import rd, q, add_job, get_job_by_id
+from jobs import rd, q, add_job, get_job_by_id, jdb
 app = Flask(__name__)
 eq_data = {'all_month':[]}
 
@@ -99,16 +99,21 @@ def jobs_api():
         except Exception as e:
             return json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
     
-        return json.dumps(add_job(job['start'], job['end']), indent=2) + '\n'
+        return json.dumps(add_job(job['min_mag'], job['max_mag']), indent=2) + '\n'
 
     elif request.method == 'GET':
-        return """
+        redis_dict = {}
+        for key in jdb.keys():
+            redis_dict[str(key)] = {}
+            redis_dict[str(key)]['datetime'] = jdb.hget(key, 'datetime')
+            redis_dict[str(key)]['status'] = jdb.hget(key, 'status')
+        return json.dumps(redis_dict, indent=4) + '\n' + """
   To submit a job, do the following:
-  curl localhost:5028/jobs -X POST -d '{"start":1, "end":2}' -H "Content-Type: application/json"
+  curl localhost:5028/jobs -X POST -d '{"min_mag":1, "max_mag":2}' -H "Content-Type: application/json"
 """
 
 @app.route('/jobs/<job_uuid>', methods=['GET'])
-def get_job_result(job_uuid):
+def get_job_result(job_uuid: str):
     """
     API route for checking on the status of a submitted job
     """
