@@ -19,6 +19,9 @@ spec:
         - name: earthquake-flask
           imagePullPolicy: Always
           image: serenashah/earthquake-api:0.1
+          env: 
+          - name: REDIS_IP
+            value: "10.109.228.201" 
           ports:
           - name: http
             containerPort: 5000

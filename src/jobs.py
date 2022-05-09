@@ -71,6 +71,5 @@ def update_job_status(jid, status):
     if job:
         job['status'] = status
         _save_job(_generate_job_key(jid), job)
-
     else:
         raise Exception()

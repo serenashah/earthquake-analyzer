@@ -19,3 +19,6 @@ spec:
         - name: earthquake-wrk
           imagePullPolicy: Always
           image: serenashah/earthquake-wrk:0.1
+          env:
+          - name: REDIS_IP
+            value: "10.109.228.201"
