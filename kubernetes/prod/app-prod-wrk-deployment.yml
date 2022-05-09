@@ -1,0 +1,21 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: earthquake-wrk-deployment
+  labels:
+    app: earthquake-wrk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: earthquake-wrk
+  template:
+    metadata:
+      labels:
+        app: earthquake-wrk
+    spec:
+      containers:
+        - name: earthquake-wrk
+          imagePullPolicy: Always
+          image: serenashah/earthquake-wrk:0.1
