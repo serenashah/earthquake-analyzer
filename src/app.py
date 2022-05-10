@@ -111,6 +111,7 @@ def jobs_api():
   To submit a job, do the following:
   curl localhost:5028/jobs -X POST -d '{"min_mag":1, "max_mag":2}' -H "Content-Type: application/json"
 """
+
 @app.route('/jobs/delete/<job_uuid>', methods=['DELETE'])
 def delete_job(job_uuid:str):
     """
@@ -129,8 +130,10 @@ def delete_job(job_uuid:str):
     else:
         return """
     This is a route for DELETE-ing former jobs. Use the form:
-    curl -X DELETE localhost:5028/jobs/delete/<job_id>
-""" 
+    curl -X DELETE localhost:5028/jobs/delete/<job>
+    Or to delete all jobs, use the form:
+    curl -X DELETE localhost:5028/jobs/delete/all
+    """ 
 
 @app.route('/jobs/<job_uuid>', methods=['GET'])
 def get_job_result(job_uuid: str):
@@ -138,8 +141,6 @@ def get_job_result(job_uuid: str):
     API route for checking on the status of a submitted job
     """
     return json.dumps(get_job_by_id(job_uuid), indent=2) + '\n'
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, host = '0.0.0.0')

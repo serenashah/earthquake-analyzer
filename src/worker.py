@@ -3,13 +3,13 @@ import time
 
 @q.worker
 def execute_job(jid):
-    update_job_status(jid, 'in progress')
     print('hello')
+    update_job_status(jid, 'in progress')
     mag_list = []
-    for key in rd.keys():
-        if key('mag') >= jdb.hget(key, 'min_mag'):
-            if key('mag') <= jdb.hget(key, 'max_mag'):
-                mag_list.append(key('mag'))
+    for item in rd.keys():
+        if float(rd.hget(item, 'mag')) >= float(jdb.hget(item, 'min_mag')):
+            if float(rd.hget(item, 'mag')) <= float(jdb.hget(item, 'max_mag')):
+                mag_list.append(rd.hget(item, 'mag'))
     update_job_status(jid, 'complete')
     rd.hset(job, 'magnitudes in range', mag_list)
     return
