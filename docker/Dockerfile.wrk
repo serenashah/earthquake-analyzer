@@ -3,6 +3,10 @@ FROM centos:7.9.2009
 RUN yum update -y && \
     yum install -y python3
 
+FROM python:3.9
+RUN pip install pandas
+RUN pip install geopandas
+
 RUN mkdir /app
 WORKDIR /app
 COPY requirements.txt /app/requirements.txt
