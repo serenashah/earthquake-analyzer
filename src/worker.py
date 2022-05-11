@@ -1,4 +1,4 @@
-from jobs import q, rd, jdb, update_job_status
+from jobs import q, rd, jdb, update_job_status, get_job_by_id
 import json
 import time
 import numpy as np
@@ -31,9 +31,10 @@ def execute_job(jid):
     logging.critical('Inside worker.')
     update_job_status(jid, 'in progress')
     
-    for key in jdb.keys():
-        mag = float(jdb.hget(key, 'mag'))
-        logging.critical(f'input: {mag}')
+    job = get_job_by_id(jid)
+    logging.critical(job)
+    mag = job[b'mag']
+    logging.critical(f'mag: {mag}')
 
     df = pd.DataFrame(pts('mag',float(mag)))
     df_geo = gpd.GeoDataFrame(df, geometry = gpd.points_from_xy(df.longitude,df.latitude))

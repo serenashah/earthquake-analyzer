@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-from flask import Flask, request
+from flask import Flask, request, send_file
 import json
+import logging
 import csv
 from jobs import rd, q, add_job, get_job_by_id, jdb
+logging.basicConfig()
 app = Flask(__name__)
 eq_data = {'all_month':[]}
 
@@ -79,7 +81,7 @@ def delete_feature(id_num: str):
             rd.delete(item)
             return (f'Earthquake {id_num} DELETED.\n')
 
-@app.route('/update/<id_num>/<feature_string>/<new_value>', methods =['UPDATE'])
+@app.route('/update/<id_num>/<feature_string>/<new_value>', methods =['PUT'])
 def update_feature(id_num: str, feature_string:str, new_value:str):
     feature_list = []
     for item in rd.keys():
@@ -102,12 +104,11 @@ def jobs_api():
         return json.dumps(add_job(job['mag']), indent=2) + '\n'
 
     elif request.method == 'GET':
-        redis_dict = {}
+        redis_list = []
+        logging.critical(jdb)
         for key in jdb.keys():
-            redis_dict[str(key)] = {}
-            redis_dict[str(key)]['datetime'] = jdb.hget(key, 'datetime')
-            redis_dict[str(key)]['status'] = jdb.hget(key, 'status')
-        return json.dumps(redis_dict, indent=4) + '\n' + """
+            redis_list.append(get_job_by_id(key.strip(b'job.')))
+        return json.dumps(redis_list, indent=1) + '\n' + """
   To submit a job, do the following:
         curl localhost:5028/jobs -X POST -d '{"mag":<mag_num>}' -H "Content-Type: application/json"
 """
@@ -123,6 +124,7 @@ def delete_job(job_uuid:str):
                 jdb.delete(key)
             return f'All jobs deleted.\n'
         else:
+            str_id = get_job_by_id(job_uuid)[b'id'].decode('utf-8')
             for key in jdb.keys():
                 if key == job_uuid:
                     jdb.delete(key)
@@ -140,13 +142,22 @@ def get_job_result(job_uuid: str):
     """
     API route for checking on the status of a submitted job
     """
-    return json.dumps(get_job_by_id(job_uuid), indent=2) + '\n'
+    job_dict = {'id':[], 'datetime':[], 'status':[], 'mag':[]}
 
-@app.route('/download/<jobuuid>', methods=['GET'])
-def download(jobuuid):
-    path = f'/app/{jobuuid}.png'
+    for key in get_job_by_id(job_uuid):
+        logging.critical("INSIDE ENCODING LOOP")
+        str_key = key.decode('utf-8')
+        str_val = get_job_by_id(job_uuid)[key].decode('utf-8')
+        job_dict[str_key].append(str_val)
+
+    logging.critical(job_dict)
+    return json.dumps(job_dict, indent=0) + '\n'
+
+@app.route('/download/<job_uuid>', methods=['GET'])
+def download(job_uuid):
+    path = f'/app/{job_uuid}.png'
     with open(path, 'wb') as f:
-        f.write(rd.hget(jobuuid, 'image'))
+        f.write(jdb.hget(job_uuid, 'image'))
     return send_file(path, mimetype='image/png', as_attachment=True)
 
 if __name__ == '__main__':

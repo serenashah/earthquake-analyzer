@@ -12,7 +12,7 @@ if not redis_ip:
 
 rd = redis.Redis(host=redis_ip, port=6379, db=0, decode_responses=True)
 q = HotQueue("queue", host=redis_ip, port=6379, db=1)
-jdb = redis.Redis(host=redis_ip, port=6379, db=2, decode_responses=True)
+jdb = redis.Redis(host=redis_ip, port=6379, db=2)
 
 def _generate_jid():
     """
@@ -64,7 +64,7 @@ def add_job(mag, status="submitted"):
 
 def get_job_by_id(jid):
     """Return job dictionary given jid"""
-    return (jdb.hgetall(_generate_job_key(jid).encode('utf-8')))
+    return (jdb.hgetall(_generate_job_key(jid)))
 
 def update_job_status(jid, status):
     """Update the status of job with job id `jid` to status `status`."""
