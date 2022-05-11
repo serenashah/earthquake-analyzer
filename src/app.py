@@ -142,5 +142,12 @@ def get_job_result(job_uuid: str):
     """
     return json.dumps(get_job_by_id(job_uuid), indent=2) + '\n'
 
+@app.route('/download/<jobuuid>', methods=['GET'])
+def download(jobuuid):
+    path = f'/app/{jobuuid}.png'
+    with open(path, 'wb') as f:
+        f.write(rd.hget(jobuuid, 'image'))
+    return send_file(path, mimetype='image/png', as_attachment=True)
+
 if __name__ == '__main__':
     app.run(debug=True, host = '0.0.0.0')

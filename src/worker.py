@@ -1,6 +1,6 @@
 from jobs import q, rd, jdb, update_job_status
+import json
 import time
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 import geopandas as gpd
@@ -23,6 +23,7 @@ def pts(key: str, val: float):
                 latitude.append(rd.hget(item, 'latitude'))
     xy['longitude'] = longitude
     xy['latitude'] = latitude
+    logging.critical(json.dumps(xy, indent = 1))
     return xy
 
 @q.worker
@@ -32,6 +33,7 @@ def execute_job(jid):
     
     for key in jdb.keys():
         mag = float(jdb.hget(key, 'mag'))
+        logging.critical(f'input: {mag}')
 
     df = pd.DataFrame(pts('mag',float(mag)))
     df_geo = gpd.GeoDataFrame(df, geometry = gpd.points_from_xy(df.longitude,df.latitude))
@@ -44,8 +46,11 @@ def execute_job(jid):
     plt.yticks(np.arange(-90, 100, step=10))
     plt.title(f'Earthquakes With Magnitude >= {mag}')
     plt.savefig(f'EqwksWthMagGrtrThan{mag}.png',dpi=600)
-    
-    logging.critical(f'EqwksWthMagGrtrThan{mag}.png is saved')
+
+    with open(f'EqwksWthMagGrtrThan{mag}.png', 'rb') as f:
+        img = f.read()
+        
+    jdb.hset(jid, 'image', img)
     update_job_status(jid, 'complete')
     
     return 
