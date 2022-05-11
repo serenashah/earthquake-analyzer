@@ -99,7 +99,7 @@ def jobs_api():
         except Exception as e:
             return json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
     
-        return json.dumps(add_job(job['min_mag'], job['max_mag']), indent=2) + '\n'
+        return json.dumps(add_job(job['mag']), indent=2) + '\n'
 
     elif request.method == 'GET':
         redis_dict = {}
@@ -109,7 +109,7 @@ def jobs_api():
             redis_dict[str(key)]['status'] = jdb.hget(key, 'status')
         return json.dumps(redis_dict, indent=4) + '\n' + """
   To submit a job, do the following:
-  curl localhost:5028/jobs -X POST -d '{"min_mag":1, "max_mag":2}' -H "Content-Type: application/json"
+        curl localhost:5028/jobs -X POST -d '{"mag":<mag_num>}' -H "Content-Type: application/json"
 """
 
 @app.route('/jobs/delete/<job_uuid>', methods=['DELETE'])

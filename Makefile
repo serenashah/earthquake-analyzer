@@ -47,4 +47,4 @@ run-all: db-run api-run worker-run
 
 cycle-api: api-stop api-build api-run
 
-cycle-wrk: wrk-stop wrk-build wrk-run
+cycle-wrk: worker-stop worker-build worker-run
