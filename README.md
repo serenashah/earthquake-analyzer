@@ -67,7 +67,7 @@ Alter the ```NAME```, ```GID```, and ```UID``` at the top of the Makefile with t
 The containers will run in the background and you can curl routes provided by the Flask API once you have posted data to the application.
 
 ## Deploying Containers in Kubernetes
-![Diagram](Final Diagram.png)
+![Diagram](FinalDiagram.png)
 The user deploys the API and worker through Kubernetes, or uses running deployments. The API provides routes for basic CRUD operations that post the data to a Redis database and query the data. It also allows the user to submit a job of plotting analysis. The jobs script will create a queue that triggers the worker to execute the plotting analysis. The user can retrieve this analysis by saving it to their local machine with an API route for downloading. 
 
 Once you're in your Kuberenetes namespace, enter a Python debug pod to be able to access the API's HTTP routes. The deployments for the api, its service, the database, its service and volume claim, and the worker have been deployed. 
