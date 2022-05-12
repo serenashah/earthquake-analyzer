@@ -1,8 +1,6 @@
 # Global Earthquake Analyzer - Magnitudes and Errors
 
-This application outputs data for the position and velocity of the International Space Station (ISS), as well as the places around the world where the ISS was sighted.
-The application does this by collecting data from XML files and making them easier for a person to read the country, region, city, time, 
-position in cartesian coordinates, units of velocity, magnitude of velocity, and other details associated with the ISS for a particular sighting or epoch.   
+This application outputs data for earthquakes that have been sensed and recorded all around the globe, including magnitude, location, time, etc. The application does this by collecting data from a CSV file and making it easier for a user to read all details associated with a particular earthquake or find data based on a specific factor such as magnitude of a certain size.   
 
 ## Files
 ##### ```/src```: Source Scripts
@@ -26,9 +24,10 @@ position in cartesian coordinates, units of velocity, magnitude of velocity, and
 
 ##### CSV file to be used as data:
 - ```all_month.csv```: a CSV with global earthquake data set that describes various features of the recorded earthquake
-- 
+
 ### Obtaining Dataset
 The CSV file above comes from the United State government's official website found [here](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
+
 ### Get files
 
 ##### Clone the contents of this repository by entering what follows the $ into a terminal or SCP client:
@@ -37,7 +36,7 @@ The CSV file above comes from the United State government's official website fou
 $ git clone https://github.com/serenashah/earthquake-analyzer.git
 ```
 
-(other methods for cloning a repository are described here [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository))
+(other methods for cloning a repository are described [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository))
 
 #### CSV file download
 - Required data files: `all_month.csv` 
@@ -88,32 +87,34 @@ $ curl localhost:<your port number>/help
 Output below explains how to download the data and lists of the routes:
 
 ```
- 
-FIRST LOAD DATA USING THE FOLLOWING PATH: /load -X POST
-
-    IF THERE ARE ERRORS LOAD THE DATA ONCE MORE
-
-
-    Navigation:
-
+FIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
+    IF THERE ARE ERROR LOAD THE DATA ONCE MORE
+    
     Use the following routes to access the data:
-      1.  /epochs
-          #lists all epochs
-      2.  /epochs/<epoch>
-          #data for specific epoch
-      3.  /countries
-          #lists all countries
-      4.  /countries/<country>
-          #data for specific country
-      5.  /countries/<country>/regions
-          #lists all regions
-      6.  /countries/<country>/regions/<region>
-          #data for specific region
-      7.  /countries/<country>/regions/<region>/cities
-          #lists all cities
-      8. /countries/<country>/regions/<region>/cities/<cities>
-          #data for specific city
-
+      1.  /help
+          #explains navigation of the app
+      2.  /data
+          #retrieves data usable in a JSON format, GET returns it
+      3.  /feature/<feat_string>
+          #posts data for a specific column in the csv
+      4.  /earthquake/<id_num>
+          #posts data from all columns for one earthquake
+      5.  /magnitude/<mag>
+          #all the earthquakes for a given magnitude
+      6.  /delete/<id_num>
+          #deletes an entry on the list based on id, or use 'all' to delete all jobs
+      7.  /update/<id_num>/<feature_string>/<new_value>
+          #changes the value of a feature for an earthquake
+      8.  /jobs
+          #uses a JSON to create a job
+      9.  /jobs/delete/<job_uuid>
+          #deletes one of the jobs that has been created
+      10.  /jobs/<job_uuid>
+          #API route for checking on the status of a submitted job
+      11.  /download_map/<job_uuid>
+          #plots map of earthquake magnitudes and downloads as png
+      12.  /download_plot/<job_uuid>
+          #plots graph of earthquake magnitudes and downloads to local machine 
 ```
 
 #### `/load` - loads data from XML files
