@@ -87,31 +87,35 @@ $ curl localhost:<your port number>/help
 Output below explains how to download the data and lists of the routes:
 
 ```
- 
-FIRST LOAD DATA USING THE FOLLOWING PATH: /load -X POST
 
-    IF THERE ARE ERRORS LOAD THE DATA ONCE MORE
-
-
-    Navigation:
-
+FIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
+    IF THERE ARE ERROR LOAD THE DATA ONCE MORE\n\n
+    Navigation:\n
     Use the following routes to access the data:
-      1.  /epochs
-          #lists all epochs
-      2.  /epochs/<epoch>
-          #data for specific epoch
-      3.  /countries
-          #lists all countries
-      4.  /countries/<country>
-          #data for specific country
-      5.  /countries/<country>/regions
-          #lists all regions
-      6.  /countries/<country>/regions/<region>
-          #data for specific region
-      7.  /countries/<country>/regions/<region>/cities
-          #lists all cities
-      8. /countries/<country>/regions/<region>/cities/<cities>
-          #data for specific city
+      1.  /help
+          #explains navigation of the app
+      2.  /data
+          #retrieves data usable in a JSON format, GET returns it
+      3.  /feature/<feat_string>
+          #posts data for a specific column in the csv
+      4.  /earthquake/<id_num>
+          #posts data from all columns for one earthquake
+      5.  /magnitude/<mag>
+          #all the earthquakes for a given magnitude
+      6.  /delete/<id_num>
+          #deletes an entry on the list based on id, or use 'all' to delete all jobs
+      7.  /update/<id_num>/<feature_string>/<new_value>
+          #changes the value of a feature for an earthquake
+      8.  /jobs
+          #uses a JSON to create a job
+      9.  /jobs/delete/<job_uuid>
+          #deletes one of the jobs that has been created
+      10.  /jobs/<job_uuid>
+          #API route for checking on the status of a submitted job
+      11.  /download_map/<job_uuid>
+          #plots map of earthquake magnitudes and downloads as png
+      12.  /download_plot/<job_uuid>
+          #plots graph of earthquake magnitudes and downloads to local machine 
 
 ```
 
