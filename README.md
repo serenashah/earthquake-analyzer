@@ -27,6 +27,7 @@ This application outputs data for earthquakes that have been sensed and recorded
 
 ### Obtaining Dataset
 The CSV file above comes from the United State government's official website found [here](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
+
 ### Get files
 
 ##### Clone the contents of this repository by entering what follows the $ into a terminal or SCP client:
