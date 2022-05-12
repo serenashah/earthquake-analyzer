@@ -44,6 +44,7 @@ def test_jobs_info():
     assert response.status_code == 200
     assert bool(re.search('To submit a job, do the following', response.text)) == True
 
+
 def test_jobs_cycle():
     route = f'{api_prefix}/jobs'
     job_data = {'mag':5.0}
@@ -56,22 +57,14 @@ def test_jobs_cycle():
     assert isinstance(UUID, str) == True
     assert response.json()['status'] == 'submitted'
 
-    time.sleep(15)
-    route = f'{api_prefix}/jobs/{UUID}'
-    response = requests.get(route)
 
-    assert response.ok == True
-    assert response.status_code == 200
-    assert response.json()['status'] == 'complete'
-
-"""
 def test_jobs_delete():
     route1 = f'{api_prefix}/jobs'
     job_data = {'mag':6.0}
     response1 = requests.post(route1, json=job_data)
     UUID = response1.json()['id']
     
-    time.sleep(15)
+    time.sleep(30)
 
     route = f'{api_prefix}/jobs/delete/{UUID}'
     response = requests.delete(route)
@@ -79,4 +72,3 @@ def test_jobs_delete():
     assert response.ok == True
     assert response.status_code == 200
     assert bool(re.search('has been deleted', response.text)) == True
-""" 
