@@ -1,11 +1,11 @@
-# International Space Station Tracker - Positions and Sightings
+# Global Earthquake Analyzer - Magnitudes and Errors
 
 This application outputs data for the position and velocity of the International Space Station (ISS), as well as the places around the world where the ISS was sighted.
 The application does this by collecting data from XML files and making them easier for a person to read the country, region, city, time, 
 position in cartesian coordinates, units of velocity, magnitude of velocity, and other details associated with the ISS for a particular sighting or epoch.   
 
 ## Files
-##### ```/src```: Main Scripts
+##### ```/src```: Source Scripts
 - ```app.py```: this Flask application that uses CRUD operations and allows users to submit jobs to output information about the ISS 
 - ```jobs.py```: this Python script creates a job from the Flask API and adds it to a HotQueue queue, and updates its status.
 - ```worker.py```: this Python script reads the queue and executes a mapping and plotting analysis.
@@ -14,9 +14,7 @@ position in cartesian coordinates, units of velocity, magnitude of velocity, and
 - ```Dockerfile.wrk```: creates a Docker image needed to containerize the worker
 - ```Makefile```: automation tool that serves as a tool to clean, build, and run the containers
 - ```requirements.txt```: captures the required libraries and packages for the application in Dockerfiles
-##### CSV file to be used as data:
-- ```all_month.csv```: a CSV with global earthquake data set that describes various features of the recorded earthquake
-#### ```/test```: Test Suite
+##### ```/test```: Test Suite
 - ```test_app.py```: Pytest suite for the Flask application routes
 ##### ```/kubernetes/prod```: Kubernetes yaml Files
 - ```app-prod-api-deployment.yml```: pulls earthquake api container from Dockerhub and deploys it.
@@ -26,78 +24,52 @@ position in cartesian coordinates, units of velocity, magnitude of velocity, and
 - ```app-prod-db-pvc.yml```: make a request for storage to the Kubernetes admin for the database.
 - ```app-prod-wrk-deployment.yml```: pulls worker container from DockerHub and deploys it in two replicas so that two workers can be working on the queue concurrently.
 
+##### CSV file to be used as data:
+- ```all_month.csv```: a CSV with global earthquake data set that describes various features of the recorded earthquake
+- 
 ### Obtaining Dataset
-The XML files above come from NASA's official website found [here](https://data.nasa.gov/Space-Science/ISS_COORDS_2022-02-13/r6u8-bhhq).
-
+The CSV file above comes from the United State government's official website found [here](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
 ### Get files
 
 ##### Clone the contents of this repository by entering what follows the $ into a terminal or SCP client:
 
 ```
-$ git clone https://github.com/osvasali/ISS-Tracker
+$ git clone https://github.com/serenashah/earthquake-analyzer.git
 ```
 
 (other methods for cloning a repository are described here [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository))
 
-#### XML file download
-- Required data files: `ISS.OEM_J2K_EPH.xml` and `XMLsightingData_citiesUSA06.xml`
-- Download the data [here](https://data.nasa.gov/Space-Science/ISS_COORDS_2022-02-13/r6u8-bhhq)
-    - ```ISS.OEM_J2K_EPH.xml```: Titled "Public Distribution"
-    - ```XMLsightingData_citiesUSA06.xml```: Titled "XMLsightingData_citiesUSA06"
+#### CSV file download
+- Required data files: `all_month.csv` 
+- Download the data [here](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php)
+    - ```all_month.csv```: "All Earthquakes"
 
 ##### Download the files by entering what follows the $ into a terminal or SCP client:
-
 ```
-$ wget https://nasa-public-data.s3.amazonaws.com/iss-coords/2022-02-13/ISS_OEM/ISS.OEM_J2K_EPH.xml
-$ wget https://nasa-public-data.s3.amazonaws.com/iss-coords/2022-02-13/ISS_sightings/XMLsightingData_citiesUSA06.xml
+$ https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv
 ```
 
-## Build Containerized App
+## Build Containerized App on Local Machine
 
-The image may built by using either the Dockerfile or Makefile in this repository.
+The images may built by using either the Dockerfiles or Makefile in this repository.
 Replace `<username>` and `<tag>` with your own username and tag.
-You may replace `<your port number>` with 5027 or another port not in use
+You may replace `<your port number>` with 5028 or another port not in use
 
 ### Using Makefile
-#### Enter the following to pull and run a pre-containerized copy of the app
-
-```
-$ make pull
-$ make run
-```
 ####  Enter the following to build and run new image
 ```
-$ NAME="<username>" make build
-$ NAME="<username>" make run
+$ make all
 ```
+This stops, builds, and runs the API image, worker image, and Redis image.
+Create a directory ```data``` with root privileges to mount the data before running this command.
+Alter the ```NAME```, ```GID```, and ```UID``` at the top of the Makefile with the appropriate values for your local machine.
 
-### Using Dockerfile
+The containers will run in the background and you can curl routes provided by the Flask API once you have posted data to the application.
 
-#### Make requirements.txt - enter the following
+## Deploying Containers in Kubernetes
 
-```
-$ emacs requirements.txt
-```
-Next type `Flask==2.0.3` then enter the following commands to save and exit the file.
-
-1. `ctrl X` or `cmd X`
-2. `ctrl S` or `cmd S`
-3. `ctrl Z` or `cmd Z`
-
-#### Enter the following to pull and run a pre-containerized copy of the app
-
-```
-$ docker pull osvasali/iss-tracker:midterm1
-$ docker run --name "iss-tracker" -d -p <your port number>:5000 osvasali/iss-tracker:midterm1
-```
-####  Enter the following to build and run new image
-```
-$ docker build -t <username>/iss-tracker:<tag> .
-$ docker run --name "iss-tracker" -d -p <your port number>:5000 osvasali/iss-tracker:midterm1
-```
 
 ## How to Interact with the Application
-
 This section details how to interact with the application and interpret the results.
 
 The following is a template of how to interact with the application replacing  `<your port number>` with the port number you are using and
