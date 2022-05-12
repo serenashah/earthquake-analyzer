@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serena-flask-cluster-ip
+spec:
+  type: NodePort
+  selector:
+    app: earthquake-flask
+  ports:
+  - name: http
+    port: 5000
+    targetPort: 5000
+    nodePort: 30028
