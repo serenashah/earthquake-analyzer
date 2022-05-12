@@ -1,10 +1,12 @@
 from datetime import datetime
+import logging
 import json
 import os
 import uuid
 from flask import Flask, request
 import redis
 from hotqueue import HotQueue
+logging.basicConfig()
 
 redis_ip = os.environ.get('REDIS_IP')
 if not redis_ip:
@@ -64,13 +66,18 @@ def add_job(mag, status="submitted"):
 
 def get_job_by_id(jid):
     """Return job dictionary given jid"""
-    return (jdb.hgetall(_generate_job_key(jid)))
+    return jdb.hgetall(_generate_job_key(jid))
 
 def update_job_status(jid, status):
     """Update the status of job with job id `jid` to status `status`."""
     job = get_job_by_id(jid)
+    logging.critical('jid in jobs: ' + jid)
+    logging.critical(job)
+    logging.critical(status)
+    logging.critical(q.get())
     if job:
         job['status'] = status
         _save_job(_generate_job_key(jid), job)
     else:
+        logging.critical('Could not find job' + jid)
         raise Exception()

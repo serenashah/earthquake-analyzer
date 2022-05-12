@@ -8,6 +8,35 @@ logging.basicConfig()
 app = Flask(__name__)
 eq_data = {'all_month':[]}
 
+@app.route('/help', methods=['GET'])
+def help() -> str:
+    '''
+    Information on how to interact with the application
+    Returns: A string describing what paths to use for each function.
+    '''
+    return '''\nFIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
+    IF THERE ARE ERROR LOAD THE DATA ONCE MORE\n\n
+    Navigation:\n
+    Use the following routes to access the data:
+      1.  /feature/<feat_string>
+          #posts data for a specific column in the csv
+      2.  /earthquake/<id_num>
+          #posts data from all columns for one earthquake
+      3.  /magnitude/<mag>
+          #all the earthquakes for a given magnitude
+      4.  /delete/<id_num>
+          #deletes an entry on the list based on id, or use 'all' to delete all jobs
+      5.  /update/<id_num>/<feature_string>/<new_value>
+          #changes the value of a feature for an earthquake
+      6.  /jobs
+          #uses a JSON to create a job
+      7.  /jobs/delete/<job_uuid>
+          #deletes one of the jobs that has been created
+      8.  /jobs/<job_uuid>
+          #API route for checking on the status of a submitted job
+      9.  /download/<jobuuid>
+          #plots map of earthquake magnitudes and downloads as png\n\n'''
+
 @app.route('/data', methods=['POST', 'GET'])
 def download_data():
     '''
@@ -107,7 +136,11 @@ def jobs_api():
         redis_list = []
         logging.critical(jdb)
         for key in jdb.keys():
-            redis_list.append(get_job_by_id(key.strip(b'job.')))
+            if not key.startswith(b'job.'):
+                continue
+            job_uuid = key.strip(b'job.').decode('utf-8')
+            job_dict = byte_to_str(job_uuid)
+            redis_list.append(job_dict)
         return json.dumps(redis_list, indent=1) + '\n' + """
   To submit a job, do the following:
         curl localhost:5028/jobs -X POST -d '{"mag":<mag_num>}' -H "Content-Type: application/json"
@@ -124,11 +157,14 @@ def delete_job(job_uuid:str):
                 jdb.delete(key)
             return f'All jobs deleted.\n'
         else:
-            str_id = get_job_by_id(job_uuid)[b'id'].decode('utf-8')
+            str_id = 'job.' + job_uuid
+            logging.critical("changing input:" + str_id)
             for key in jdb.keys():
-                if key == job_uuid:
+                logging.critical("jdb key: " + key.decode('utf-8'))
+                if key.decode('utf-8') == str_id:
                     jdb.delete(key)
-        return f'{job_uuid} has been deleted.\n'
+                    return f'{job_uuid} has been deleted.\n'
+        
     else:
         return """
     This is a route for DELETE-ing former jobs. Use the form:
@@ -142,16 +178,17 @@ def get_job_result(job_uuid: str):
     """
     API route for checking on the status of a submitted job
     """
-    job_dict = {'id':[], 'datetime':[], 'status':[], 'mag':[]}
-
-    for key in get_job_by_id(job_uuid):
-        logging.critical("INSIDE ENCODING LOOP")
-        str_key = key.decode('utf-8')
-        str_val = get_job_by_id(job_uuid)[key].decode('utf-8')
-        job_dict[str_key].append(str_val)
-
-    logging.critical(job_dict)
+    job_dict = byte_to_str(job_uuid)
     return json.dumps(job_dict, indent=0) + '\n'
+
+def byte_to_str(job_uuid:str):
+    job_dict = {}
+    job_bytes = get_job_by_id(job_uuid)
+    for key in job_bytes:
+        str_key = key.decode('utf-8')
+        str_val = job_bytes[key].decode('utf-8')
+        job_dict[str_key] = str_val
+    return job_dict
 
 @app.route('/download/<job_uuid>', methods=['GET'])
 def download(job_uuid):

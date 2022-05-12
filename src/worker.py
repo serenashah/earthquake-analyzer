@@ -29,6 +29,7 @@ def pts(key: str, val: float):
 @q.worker
 def execute_job(jid):
     logging.critical('Inside worker.')
+    logging.critical('jid worker: ' + jid)
     update_job_status(jid, 'in progress')
     
     job = get_job_by_id(jid)
@@ -43,12 +44,13 @@ def execute_job(jid):
     df_geo.plot(ax = axis, color = 'red', markersize=8, alpha=0.5, edgecolor='thistle', linewidth=0.4)
 
     axis.set_facecolor('powderblue')
-    plt.xticks(np.arange(-180, 190, step=10), rotation = 45)
+    plt.xticks(np.arange(-180, 190, step=10), rotation = 90)
     plt.yticks(np.arange(-90, 100, step=10))
-    plt.title(f'Earthquakes With Magnitude >= {mag}')
-    plt.savefig(f'EqwksWthMagGrtrThan{mag}.png',dpi=600)
+    mag_title = mag.decode('utf-8')
+    plt.title(f'Earthquakes With Magnitude >= {mag_title}')
+    plt.savefig(f'EqwksWthMagGrtrThan{mag_title}.png',dpi=600)
 
-    with open(f'EqwksWthMagGrtrThan{mag}.png', 'rb') as f:
+    with open(f'EqwksWthMagGrtrThan{mag_title}.png', 'rb') as f:
         img = f.read()
         
     jdb.hset(jid, 'image', img)
