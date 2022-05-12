@@ -36,7 +36,7 @@ The CSV file above comes from the United State government's official website fou
 $ git clone https://github.com/serenashah/earthquake-analyzer.git
 ```
 
-(other methods for cloning a repository are described here [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository))
+(other methods for cloning a repository are described [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository))
 
 #### CSV file download
 - Required data files: `all_month.csv` 
