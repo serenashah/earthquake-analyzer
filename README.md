@@ -73,7 +73,7 @@ Enter the pod with the following command:
 $ kubectl exec -it <python debug pod> -- /bin/bash
 #
 ```
-If you wish to create your own API, worker, and database pods use the command below for each of the yaml files. Be sure to configure your db pods first so that the API and worker can find the IP of the DB.
+If you wish to create your own API, worker, and database pods use the command below for each of the yaml files to deploy. Be sure to configure your db pods first so that the API and worker can find the IP of the DB.
 ```
 $ kubectl apply -f <app-prod-yamlfile>
 ```
