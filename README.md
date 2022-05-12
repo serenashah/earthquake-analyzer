@@ -24,7 +24,7 @@ This application outputs data for earthquakes that have been sensed and recorded
 
 ##### CSV file to be used as data:
 - ```all_month.csv```: a CSV with global earthquake data set that describes various features of the recorded earthquake
-- 
+
 ### Obtaining Dataset
 The CSV file above comes from the United State government's official website found [here](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
 ### Get files
