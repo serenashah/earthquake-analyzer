@@ -1,8 +1,6 @@
 # Global Earthquake Analyzer - Magnitudes and Errors
 
-This application outputs data for the position and velocity of the International Space Station (ISS), as well as the places around the world where the ISS was sighted.
-The application does this by collecting data from XML files and making them easier for a person to read the country, region, city, time, 
-position in cartesian coordinates, units of velocity, magnitude of velocity, and other details associated with the ISS for a particular sighting or epoch.   
+This application outputs data for earthquakes that have been sensed and recorded all around the globe, including magnitude, location, time, etc. The application does this by collecting data from a CSV file and making it easier for a user to read all details associated with a particular earthquake or find data based on a specific factor such as magnitude of a certain size.   
 
 ## Files
 ##### ```/src```: Source Scripts
