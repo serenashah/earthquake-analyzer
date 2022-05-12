@@ -87,7 +87,6 @@ $ curl localhost:<your port number>/help
 Output below explains how to download the data and lists of the routes:
 
 ```
-
 FIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
     IF THERE ARE ERROR LOAD THE DATA ONCE MORE
     
