@@ -67,6 +67,7 @@ Alter the ```NAME```, ```GID```, and ```UID``` at the top of the Makefile with t
 The containers will run in the background and you can curl routes provided by the Flask API once you have posted data to the application.
 
 ## Deploying Containers in Kubernetes
+![Diagram](COE332_midterm_diagram.jpg)
 Once you're in your Kuberenetes namespace, enter a Python debug pod to be able to access the API's HTTP routes. The deployments for the api, its service, the database, its service and volume claim, and the worker have been deployed. 
 Enter the pod with the following command:
 ```
