@@ -117,13 +117,13 @@ FIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
           #plots graph of earthquake magnitudes and downloads to local machine 
 ```
 
-#### `/load` - loads data from XML files
+#### `/load` - loads data from CSV files
 
 ```
 $ curl localhost:<your port number>/load -X POST
 ```
  
-Output below is confirmation that the functions in app.py can now use the XML data:
+Output below is confirmation that the functions in app.py can now use the CSV data:
 
 ```
 Data has been loaded
@@ -138,13 +138,13 @@ The following output is an error message that appears when '-X POST' is accident
 <p>The method is not allowed for the requested URL.</p>
 ````
 
-#### `/epochs` - lists all epochs
+#### `/feature/<feat_string>` - lists a given feature for all earthquakes
 
 ```
-$ curl localhost:<your port number>/epochs
+$ curl localhost:<your port number>/feature/<feat_string>
 ```
  
-Sample output of epoch names:
+Sample output of earthquakes names:
 
 ```
 ...
