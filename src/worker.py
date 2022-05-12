@@ -85,7 +85,7 @@ def execute_job(jid):
     plt.ylabel('Percent Error')
     plt.xticks(np.arange(0, 140, step=10), rotation = 90)
     plt.yticks(np.arange(0, 6, step=0.5))
-    plt.title(f'Percent Magnitude Error for Number of Stations (mag >= {mag})')
+    plt.title(f'Percent Magnitude Error for Number of Stations (mag >= {mag_title})')
     plt.savefig('PctErrVSNofST.png',dpi=600)
    
     with open(f'PctErrVSNofST.png', 'rb') as f2:
