@@ -34,8 +34,12 @@ def help() -> str:
           #deletes one of the jobs that has been created
       8.  /jobs/<job_uuid>
           #API route for checking on the status of a submitted job
-      9.  /download/<jobuuid>
-          #plots map of earthquake magnitudes and downloads as png\n\n'''
+      9.  /download_map/<jobuuid>
+          #plots map of earthquake magnitudes and downloads as png
+          [pipe image i.e. "/download/<jobuuid> > map.png" to use
+      10. /download_plot/<jobuuid>
+          #plots scatter plot of # sensors vs error and downloads as png
+          [pipe image i.e. "/download_plot/<jobuuid> > plot.png" to use\n\n'''
 
 @app.route('/data', methods=['POST', 'GET'])
 def download_data():
@@ -74,7 +78,6 @@ def download_data():
 def specific_feature(feat_string: str):
     '''
     prints a given feature for all earthquakes
-    we probably should make these return lists/strings/dicts in the future
     '''
     string_list = []
     for item in rd.keys():
@@ -84,8 +87,7 @@ def specific_feature(feat_string: str):
 @app.route('/earthquake/<id_num>', methods=['GET'])
 def specific_earthquake(id_num: str):
     '''
-    prints all info abt a specific earthquake given # index
-    really we should do one by ID maybe?
+    prints all info abt a specific earthquake given its id
     '''
     for item in rd.keys():
         if rd.hget(item, 'id') == id_num:
@@ -103,7 +105,10 @@ def big_earthquake(mag: int):
     return(f'Magnitudes above {mag}\n' + json.dumps(magnitude_list, indent = 1) + '\n')
 
 @app.route('/delete/<id_num>', methods =['DELETE'])
-def delete_feature(id_num: str):
+def delete_id(id_num: str):
+    '''
+    deletes an earthquake from data given its id
+    ''' 
     feature_list = []
     for item in rd.keys():
         if rd.hget(item, 'id') == id_num:
@@ -112,6 +117,9 @@ def delete_feature(id_num: str):
 
 @app.route('/update/<id_num>/<feature_string>/<new_value>', methods =['PUT'])
 def update_feature(id_num: str, feature_string:str, new_value:str):
+    '''
+    updates a specific earthquake's feature given the id and the desired feature
+    '''
     feature_list = []
     for item in rd.keys():
         if rd.hget(item, 'id') == id_num:
@@ -122,7 +130,7 @@ def update_feature(id_num: str, feature_string:str, new_value:str):
 def jobs_api():
     """
     API route for creating a new job to do some analysis. This route accepts a JSON payload
-    describing the job to be created.
+    describing the job to be created. Also returns the jobs requested with GET.
     """
     if request.method == 'POST':
         try:
@@ -143,13 +151,13 @@ def jobs_api():
             redis_list.append(job_dict)
         return json.dumps(redis_list, indent=1) + '\n' + """
   To submit a job, do the following:
-        curl localhost:5028/jobs -X POST -d '{"mag":<mag_num>}' -H "Content-Type: application/json"
+        curl <ip_address>:<flask_port>/jobs -X POST -d '{"mag":<mag_num>}' -H "Content-Type: application/json"
 """
 
 @app.route('/jobs/delete/<job_uuid>', methods=['DELETE'])
 def delete_job(job_uuid:str):
     """
-    API route to delete a specific job.
+    API route to delete a specific job, or all.
     """
     if request.method == 'DELETE':
         if job_uuid == 'all':
@@ -168,20 +176,23 @@ def delete_job(job_uuid:str):
     else:
         return """
     This is a route for DELETE-ing former jobs. Use the form:
-    curl -X DELETE localhost:5028/jobs/delete/<job>
+    curl -X DELETE <ip_address>:<flask_port>/jobs/delete/<job>
     Or to delete all jobs, use the form:
-    curl -X DELETE localhost:5028/jobs/delete/all
+    curl -X DELETE <ip_address>:<flask_port>/jobs/delete/all
     """ 
 
 @app.route('/jobs/<job_uuid>', methods=['GET'])
 def get_job_result(job_uuid: str):
     """
-    API route for checking on the status of a submitted job
+    API route for checking on the status of a submitted job.
     """
     job_dict = byte_to_str(job_uuid)
     return json.dumps(job_dict, indent=0) + '\n'
 
 def byte_to_str(job_uuid:str):
+    """
+    Converts specific job's dict of bytes to dict of strings given the job id.
+    """
     job_dict = {}
     job_bytes = get_job_by_id(job_uuid)
     for key in job_bytes:
@@ -190,12 +201,25 @@ def byte_to_str(job_uuid:str):
         job_dict[str_key] = str_val
     return job_dict
 
-@app.route('/download/<job_uuid>', methods=['GET'])
+@app.route('/download_map/<job_uuid>', methods=['GET'])
 def download(job_uuid):
+    '''
+    downloads the map to the user's local machine. 
+    '''
     path = f'/app/{job_uuid}.png'
     with open(path, 'wb') as f:
         f.write(jdb.hget(job_uuid, 'image'))
     return send_file(path, mimetype='image/png', as_attachment=True)
+
+@app.route('/download_plot/<job_uuid>', methods=['GET'])
+def downloadplot(job_uuid):
+    '''
+    downloads the plot to the user's local machine.
+    '''
+    path = f'/app/{job_uuid}2.png'
+    with open(path, 'wb') as f:
+        f.write(jdb.hget(job_uuid, 'image_plot'))
+    return send_file(path, mimetype='image_plot/png', as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True, host = '0.0.0.0')

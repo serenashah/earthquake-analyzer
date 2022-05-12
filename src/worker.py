@@ -3,6 +3,7 @@ import json
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import geopandas as gpd
 import pandas as pd
 import logging 
@@ -49,11 +50,49 @@ def execute_job(jid):
     mag_title = mag.decode('utf-8')
     plt.title(f'Earthquakes With Magnitude >= {mag_title}')
     plt.savefig(f'EqwksWthMagGrtrThan{mag_title}.png',dpi=600)
+    plt.close()
 
     with open(f'EqwksWthMagGrtrThan{mag_title}.png', 'rb') as f:
         img = f.read()
         
     jdb.hset(jid, 'image', img)
+
+    ###################### PLOTTING FUNCTION ########################
+    xy = {}
+    nst = []
+    err = []
+    for item in rd.keys():
+        if rd.hget(item, 'nst') != '' and rd.hget(item, 'magError') != '' and float(rd.hget(item, 'mag')) >= float(mag):
+            nst.append(float(rd.hget(item, 'nst')))
+            err.append(float(rd.hget(item, 'magError')))
+    logging.critical(type(nst[0]))
+    logging.critical(err)
+    logging.critical(len(err))
+    nst_s = np.array(nst)
+    logging.critical(nst_s)
+    err_s = np.array(err)
+    c_nst = nst_s.astype(np.float)
+    c_err = err_s.astype(np.float)
+
+    order = np.argsort(c_nst)
+    xs = np.array(c_nst)[order]
+    ys = np.array(c_err)[order]
+
+    colors = np.random.randint(len(nst), size=(len(nst)))
+    plt.scatter(xs,ys,alpha=0.7,marker=".",c=colors,cmap = "hsv")
+
+    plt.xlabel('Number of Stations (seismometers)')
+    plt.ylabel('Percent Error')
+    plt.xticks(np.arange(0, 140, step=10), rotation = 90)
+    plt.yticks(np.arange(0, 6, step=0.5))
+    plt.title(f'Percent Magnitude Error for Number of Stations (mag >= {mag})')
+    plt.savefig('PctErrVSNofST.png',dpi=600)
+   
+    with open(f'PctErrVSNofST.png', 'rb') as f2:
+        imgplt = f2.read()
+
+    jdb.hset(jid, 'image_plot', imgplt)
+
     update_job_status(jid, 'complete')
     
     return 

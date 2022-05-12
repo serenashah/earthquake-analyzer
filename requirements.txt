@@ -3,3 +3,4 @@ redis
 pytest
 hotqueue
 matplotlib
+numpy
