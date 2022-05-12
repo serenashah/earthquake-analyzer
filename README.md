@@ -23,6 +23,7 @@ This application outputs data for earthquakes that have been sensed and recorded
 - ```app-prod-wrk-deployment.yml```: pulls worker container from DockerHub and deploys it in two replicas so that two workers can be working on the queue concurrently.
 
 ##### CSV file to be used as data:
+Features of the data include: time, magnitude, depth, number of stations, and place of earthquake.
 - ```all_month.csv```: a CSV with global earthquake data set that describes various features of the recorded earthquake
 
 ### Obtaining Dataset
@@ -66,17 +67,30 @@ Alter the ```NAME```, ```GID```, and ```UID``` at the top of the Makefile with t
 The containers will run in the background and you can curl routes provided by the Flask API once you have posted data to the application.
 
 ## Deploying Containers in Kubernetes
+Once you're in your Kuberenetes namespace, enter a Python debug pod to be able to access the API's HTTP routes. The deployments for the api, its service, the database, its service and volume claim, and the worker have been deployed. 
+Enter the pod with the following command:
+```
+$ kubectl exec -it <python debug pod> -- /bin/bash
+#
+```
+If you wish to create your own API, worker, and database pods use the command below for each of the yaml files. Be sure to configure your db pods first so that the API and worker can find the IP of the DB.
+```
+$ kubectl apply -f <app-prod-yamlfile>
+```
 
+You can now curl routes from the API using the already-deployed Flask service IP: 10.110.200.217 with the port 5000 through both terminal and browser (for routes receiving data). When interacting through browser, use the public URL: https://isp-proxy.tacc.utexas.edu/s_shah-1/.
 
 ## How to Interact with the Application
 This section details how to interact with the application and interpret the results.
 
-The following is a template of how to interact with the application replacing  `<your port number>` with the port number you are using and
-`<route>` with the one of the routes shown in this section.
+The following is a template of how to interact with the application with by ```curl```ing routes.
 
 ```
-$ curl localhost:<your port number>/<route>
+$ curl <ip_address>:<port_number>/<route>
 ```
+In the Kubernetes namespace, use the IP '10.110.200.217' with port '5000'.
+In your local machine, use the IP 'localhost' with port '5028'.
+The routes are listed below.
 
 #### `/help` - shows list of routes
 
@@ -117,19 +131,19 @@ FIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
           #plots graph of earthquake magnitudes and downloads to local machine 
 ```
 
-#### `/load` - loads data from CSV files
-
+#### `/data` - loads data from CSV files and returns it
+To load the data:
 ```
-$ curl localhost:<your port number>/load -X POST
+$ curl <ip_address><port_number>/data -X POST
 ```
  
 Output below is confirmation that the functions in app.py can now use the CSV data:
 
 ```
-Data has been loaded
+Data has been loaded.
 ```
 
-The following output is an error message that appears when '-X POST' is accidentally omitted
+The following output is an error message that appears when the correct verb is accidentally omitted or wrongly appended.
 
 ```
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
@@ -137,350 +151,304 @@ The following output is an error message that appears when '-X POST' is accident
 <h1>Method Not Allowed</h1>
 <p>The method is not allowed for the requested URL.</p>
 ````
+To return the data:
+```
+$ curl <ip_address><port_number>/data
+```
+Sample output:
+```
+...
+ {
+    "time": "2022-04-07T16:06:22.696Z",
+    "latitude": "38.1741",
+    "longitude": "-117.8659",
+    "depth": "7",
+    "mag": "1.2",
+    "magType": "ml",
+    "nst": "9",
+    "gap": "178.82",
+    "dmin": "0.082",
+    "rms": "0.0963",
+    "net": "nn",
+    "id": "nn00836839",
+    "updated": "2022-04-29T21:01:48.065Z",
+    "place": "32 km SE of Mina, Nevada",
+    "type": "earthquake",
+    "horizontalError": "",
+    "depthError": "2.3",
+    "magError": "0.49",
+    "magNst": "4",
+    "status": "reviewed",
+    "locationSource": "nn",
+    "magSource": "nn"
+  },
+  {
+    "time": "2022-04-10T21:32:27.950Z",
+    "latitude": "44.2876667",
+    "longitude": "-115.1273333",
+    "depth": "17.59",
+    "mag": "1.63",
+    "magType": "ml",
+    "nst": "9",
+    "gap": "107",
+    "dmin": "0.787",
+    "rms": "0.12",
+    "net": "mb",
+    "id": "mb80542779",
+    "updated": "2022-04-11T15:20:26.150Z",
+    "place": "16 km WNW of Stanley, Idaho",
+    "type": "earthquake",
+...
+```
 
 #### `/feature/<feat_string>` - lists a given feature for all earthquakes
 
 ```
-$ curl localhost:<your port number>/feature/<feat_string>
+$ curl <ip_address><port_number>/feature/<feat_string>
 ```
  
-Sample output of earthquakes names:
+Sample output of earthquakes feature:
 
 ```
 ...
-2022-057T10:12:56.869Z
-2022-057T10:16:56.869Z
-2022-057T10:20:56.869Z
-2022-057T10:24:56.869Z
-2022-057T10:28:56.869Z
-2022-057T10:32:56.869Z
-2022-057T10:36:56.869Z
-2022-057T10:40:56.869Z
-2022-057T10:44:56.869Z
-2022-057T10:48:56.869Z
-2022-057T10:52:56.869Z
-2022-057T10:56:56.869Z
-2022-057T11:00:56.869Z
-2022-057T11:04:56.869Z
-2022-057T11:08:56.869Z
-2022-057T11:12:56.869Z
-2022-057T11:16:56.869Z
-2022-057T11:20:56.869Z
-2022-057T11:24:56.869Z
-2022-057T11:28:56.869Z
-2022-057T11:32:56.869Z
-2022-057T11:36:56.869Z
-2022-057T11:40:56.869Z
-2022-057T11:44:56.869Z
-2022-057T11:48:56.869Z
-2022-057T11:52:56.869Z
-2022-057T11:56:56.869Z
-2022-057T12:00:00.000Z
+"[ID hv72995457]: 5 km SSW of P\u0101hala, Hawaii",
+ "[ID hv72981557]: 4 km E of P\u0101hala, Hawaii",
+ "[ID ak0224to2szd]: 40 km SSW of Skwentna, Alaska",
+ "[ID ok2022ilmh]: 7 km E of El Reno, Oklahoma",
+ "[ID se60149643]: 8 km NNW of Taylors, South Carolina",
+ "[ID nc73717615]: 13km ENE of Cloverdale, CA",
+ "[ID hv72993307]: 4 km SSW of P\u0101hala, Hawaii",
+ "[ID nn00837136]: 28 km NNE of Indian Springs, Nevada",
+ "[ID ci40248280]: 11km SSW of Idyllwild, CA",
+ "[ID nc73718245]: 2km NNW of The Geysers, CA",
+ "[ID nc73718301]: 7km W of Cobb, CA",
+ "[ID ak0224vjldy4]: 34 km SW of Dry Creek, Alaska",
+ "[ID av91055253]: 23 km WSW of Dutch Harbor, Alaska",
+ "[ID uu60489427]: 45 km SE of Mammoth, Wyoming",
+ "[ID nn00836634]: 29 km SSE of Mina, Nevada",
+ "[ID nc73725656]: 7km NW of The Geysers, CA",
 ...
 ```
 
-The list above may be much longer and is only an excerpt marked with breaks `...`.
+The lists above may be much longer and is only an excerpt marked with breaks `...`.
 
-#### `/epochs/<epoch>` data for specific epoch
+#### `/earthquake/<id_num>` data for specific earthquake
 
 ```
-$ curl localhost:<your port number>/epochs/<epoch>
+$ curl <ip_address><port_number>/earthquake/<id_num>
 ```
 Example:
 
 ```
-$ curl localhost:5027/epochs/2022-057T11:32:56.869Z
+$ curl <ip_address><port_number>/earthquake/us7000h0yj
 ```
 
-Output below is the data associated with one epoch:
+Output below is the data associated with one earthquake:
 
 ```
+Earthquake us7000h0yj
 {
-  "X": {
-    "#text": "-4945.2048874258298",
-    "@units": "km"
-  },
-  "X_DOT": {
-    "#text": "1.19203952554952",
-    "@units": "km/s"
-  },
-  "Y": {
-    "#text": "-3625.9704508659102",
-    "@units": "km"
-  },
-  "Y_DOT": {
-    "#text": "-5.67286420497775",
-    "@units": "km/s"
-  },
-  "Z": {
-    "#text": "-2944.7433487186099",
-    "@units": "km"
-  },
-  "Z_DOT": {
-    "#text": "4.99593211898374",
-    "@units": "km/s"
-  }
+ "time": "2022-04-09T20:52:37.344Z",
+ "latitude": "-16.3181",
+ "longitude": "166.8507",
+ "depth": "14",
+ "mag": "6.3",
+ "magType": "mww",
+ "nst": "",
+ "gap": "33",
+ "dmin": "0.93",
+ "rms": "0.88",
+ "net": "us",
+ "id": "us7000h0yj",
+ "updated": "2022-04-10T20:57:42.406Z",
+ "place": "64 km WSW of Norsup, Vanuatu",
+ "type": "earthquake",
+ "horizontalError": "5.6",
+ "depthError": "1.7",
+ "magError": "0.038",
+ "magNst": "68",
+ "status": "reviewed",
+ "locationSource": "us",
+ "magSource": "us"
 }
 ```
-
-The position is represented in kilometers and cartesian coordinates with the X, Y and Z keys. 
-The velocity in X, Y, and Z directions is represented in kilometer per second by X_DOT, Y_DOT, and Z_DOT, respectively.
-
-
-
-#### `/countries` - lists all countries
+#### `/magnitude/<mag>` - lists all countries
 
 ```
-$ curl localhost:<your port number>/countries
+$ curl <ip_address><port_number>/magnitude/<mag>
 ```
  
-This route outputs a list of every country in the XML file and the number of sightings in each country:
+This route outputs a list of all earthquakes in the last 30 days that have had a magnitude above the inputted number.
 
 ```
- --Sightings per Country--
-
-{
-  "United_States": 4857
-}
-
- There are 1 countries with sightings found
-```
-In the example above, there are 4857 sightings in the United States
-
-
-#### `/countries/<country>` - data for specific country
-
-```
-$ curl localhost:<your port number>/countries/<country>
-```
-
-Example:
-```
-$ curl localhost:5027/countries/United_States
-```
- 
-Output below is shorter that the actual output and has a break marked with an ellipsis `...`:
-
-```
+Magnitudes above 6
 [
-  {
-    "region": "Massachusetts",
-    "city": "Natick",
-    "spacecraft": "ISS",
-    "sighting_date": "Thu Feb 17/05:41 AM",
-    "duration_minutes": "5",
-    "max_elevation": "19",
-    "enters": "10 above S",
-    "exits": "10 above E",
-    "utc_offset": "-5.0",
-    "utc_time": "10:41",
-    "utc_date": "Feb 17, 2022"
-  },
-...
-  {
-    "region": "New_Jersey",
-    "city": "Green_Creek",
-    "spacecraft": "ISS",
-    "sighting_date": "Fri Feb 25/05:42 AM",
-    "duration_minutes": "3",
-    "max_elevation": "13",
-    "enters": "11 above NW",
-    "exits": "10 above NNE",
-    "utc_offset": "-5.0",
-    "utc_time": "10:42",
-    "utc_date": "Feb 25, 2022"
-  },
-  {
-    "region": "New_Jersey",
-    "city": "Green_Creek",
-    "spacecraft": "ISS",
-    "sighting_date": "Sat Feb 26/04:56 AM",
-    "duration_minutes": "2",
-    "max_elevation": "16",
-    "enters": "16 above N",
-    "exits": "10 above NNE",
-    "utc_offset": "-5.0",
-    "utc_time": "09:56",
-    "utc_date": "Feb 26, 2022"
-  }
+ "[ID us7000h0yj]: 6.3",
+ "[ID us6000hf49]: 6",
+ "[ID us6000hf75]: 6.7",
+ "[ID us7000h373]: 6.1",
+ "[ID us7000h5mc]: 6",
+ "[ID usd000h551]: 6"
 ]
 ```
-This route shows you all the sightings in the given country and all the data associated with each sighting (region, city, max_elevation, utc date, and so on)
+In the example above, a magnitude of 6 was inputted.
 
-#### `/countries/<country>/regions` - lists all regions
 
-```
-$ curl localhost:<your port number>/countries/<country>/regions
-```
-
-Example:
-```
-$ curl localhost:5027/countries/United_States/regions
-```
- 
-Output below is a list of every region in the given country:
+#### `/delete/<id_num>` - delete an earthquake from the dataset
 
 ```
---Sightings per Region--
-
-{
-  "Massachusetts": 447,
-  "Michigan": 1870,
-  "Minnesota": 545,
-  "Mississippi": 216,
-  "Missouri": 541,
-  "Montana": 235,
-  "Nebraska": 311,
-  "Nevada": 133,
-  "New_Hampshire": 310,
-  "New_Jersey": 249
-}
-
- There are 10 regions with sightings in United_States
-```
-
-The number to the right of each key is the number of sightings in that region, For example Nevada has 133 ISS sightings. The last line of the output explains the amount of regions with sightings found in the give country.
-
-
-#### `/countries/<country>/regions/<region>` - data for specific region
-
-```
-$ curl localhost:<your port number>/countries/<country>/regions/<region>
+$ curl <ip_address><port_number>/delete/<id> -X DELETE
 ```
 
 Example:
 ```
-$ curl localhost:5027/countries/United_States/regions/Nevada
+$ curl <ip_address><port_number>/delete/us7000h373 -X DELETE
 ```
- 
-Output below is shorter that the actual output and has a break marked with an ellipsis `...`:
+Output:
+```
+Earthquake us7000h373 DELETED.
+```
 
+#### `/update/<id_num>/<feature_string>/<new_value>` - update an earthquake's feature
 ```
-{
-  "Nevada": [
-    {
-      "city": "Carson_City",
-      "spacecraft": "ISS",
-      "sighting_date": "Thu Feb 17/05:46 AM",
-      "duration_minutes": "6",
-      "max_elevation": "24",
-      "enters": "10 above S",
-      "exits": "10 above ENE",
-      "utc_offset": "-8.0",
-      "utc_time": "13:46",
-      "utc_date": "Feb 17, 2022"
-    },
-    {
-      "city": "Carson_City",
-      "spacecraft": "ISS",
-      "sighting_date": "Fri Feb 18/04:59 AM",
-      "duration_minutes": "4",
-      "max_elevation": "14",
-      "enters": "10 above SSE",
-      "exits": "10 above E",
-      "utc_offset": "-8.0",
-      "utc_time": "12:59",
-      "utc_date": "Feb 18, 2022"
-    },
-    ...
-    {
-      "city": "Winnemucca",
-      "spacecraft": "ISS",
-      "sighting_date": "Fri Feb 25/05:48 AM",
-      "duration_minutes": "4",
-      "max_elevation": "16",
-      "enters": "10 above NW",
-      "exits": "10 above NNE",
-      "utc_offset": "-8.0",
-      "utc_time": "13:48",
-      "utc_date": "Feb 25, 2022"
-    }
-  ]
-}
-```
-This route shows you all the sightings in the given country and region and all the data associated with each sighting (city, max_elevation, utc date, and so on)
-
-#### `/countries/<country>/regions/<region>/cities` - lists all cities
-
-```
-$ curl localhost:<your port number>/countries/<country>/regions/<region>/cities
+$ curl <ip_address><port_number>/update/<id_num>/<feature_string>/<new_value> -X PUT
 ```
 
 Example:
 ```
-$ curl localhost:5027/countries/United_States/regions/Nevada/cities
+$ curl <ip_address><port_number>/update/us7000h0yj/mag/3 -X PUT
 ```
  
-Output below is a list of cities with sightings within a given country and region:
-
+Output:
 ```
---Cities with Sightings--
+Earthquake us7000h0yj-> mag UPDATED to 3.
+```
+Check that your CRUD operations have been effective by checking the route of the specific earthquake with its id.
 
+#### `/jobs` - post and return a job to a queue
+To check your jobs:
+```
+$ curl <ip_address><port_number>/jobs 
+``` 
+Output:
+```
+[
+ {
+  "id": "09c3445a-4a96-4813-916e-9c0f1c9e28b7",
+  "datetime": "2022-05-12 05:45:07.950146",
+  "status": "complete",
+  "mag": "2.0"
+ },
+ {
+  "id": "ed7e3439-c2ca-48ac-837e-00e49015ef2e",
+  "datetime": "2022-05-12 05:55:23.908958",
+  "status": "complete",
+  "mag": "2.0"
+ },
+ {
+  "id": "0652c635-8645-407b-a93f-6f55a77a2a27",
+  "datetime": "2022-05-12 05:34:33.971769",
+  "status": "complete",
+  "mag": "2.0"
+ }
+]
+
+  To submit a job, do the following:
+        curl <ip_address>:<flask_port>/jobs -X POST -d '{"mag":<mag_num>}' -H "Content-Type: application/json"
+```
+To post a route, as shown above:
+```
+$ curl <ip_address>:<port_number>/jobs -X POST -d '{"mag":4.0}' -H "Content-Type: application/json"
+```
+Output:
+```
 {
-  "city 1": "Carson_City",
-  "city 2": "Elko",
-  "city 3": "Ely",
-  "city 4": "Fallon",
-  "city 5": "Great_Basin_National_Park",
-  "city 6": "Las_Vegas",
-  "city 7": "Mesquite",
-  "city 8": "Reno",
-  "city 9": "Silver_Springs",
-  "city 10": "Tonopah",
-  "city 11": "Winnemucca"
+  "id": "31f9b6ea-acc9-4960-8fde-655ba093af77",
+  "datetime": "2022-05-12 08:12:51.063950",
+  "status": "submitted",
+  "mag": 4.0
 }
-
- There are 11 cities with sightings in Nevada
 ```
-The last row in the string notes how many cities with sightings there are in the given region.
 
-
-#### `/countries/<country>/regions/<region>/cities/<cities>` - data for specific city
+#### `/jobs/delete/<job_uuid>` - delete a specific job or all jobs
 
 ```
-$ curl localhost:<your port number>/countries/<country>/regions/<region>/cities
+$ curl <ip_address><port_number>/jobs/delete/<job_uuid> -X DELETE
 ```
 
 Example:
 ```
-$ curl localhost:5027/countries/United_States/regions/Nevada/cities/Reno
+$ curl <ip_address><port_number>/jobs/delete/all -X DELETE
+``` 
+Output is for deleting all jobs. If specific job desired, use its ID.
 ```
- 
-Output below is shorter that the actual output and has a break marked with an ellipsis `...`:
+All jobs deleted.
+```
+#### `/jobs/<job_uuid>` - returns update for a specific job
+
+```
+$ curl <ip_address><port_number>/jobs/<job_uuid> 
+```
+
+Example:
+```
+$ curl <ip_address><port_number>/jobs/7987e80f-b1f4-4983-bf53-2cfc33d0ffff
+```
+Output:
 
 ```
 {
-  "Reno": [
-    {
-      "spacecraft": "ISS",
-      "sighting_date": "Thu Feb 17/05:46 AM",
-      "duration_minutes": "5",
-      "max_elevation": "23",
-      "enters": "10 above S",
-      "exits": "10 above ENE",
-      "utc_offset": "-8.0",
-      "utc_time": "13:46",
-      "utc_date": "Feb 17, 2022"
-    },
-    ...
-    {
-      "spacecraft": "ISS",
-      "sighting_date": "Fri Feb 25/05:48 AM",
-      "duration_minutes": "3",
-      "max_elevation": "13",
-      "enters": "10 above NW",
-      "exits": "10 above NNE",
-      "utc_offset": "-8.0",
-      "utc_time": "13:48",
-      "utc_date": "Feb 25, 2022"
-    }
-  ]
+"id": "7987e80f-b1f4-4983-bf53-2cfc33d0ffff",
+"datetime": "2022-05-12 08:18:13.961522",
+"status": "complete",
+"mag": "4.0"
 }
-
-12 sightings found in Reno
 ```
-This route shows you all the sightings in the given country, region, and city and all the data associated with each sighting (max_elevation, utc date, duration, and so on)
+#### `/download_map/<job_uuid>` - returns map plotted by workers of earthquakes above the magnitude
 
-```bash 
-wget https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv
 ```
+$ curl <ip_address><port_number>/download_map/<job_uuid>
+```
+
+Example:
+```
+$ curl <ip_address><port_number>/download_map/7987e80f-b1f4-4983-bf53-2cfc33d0ffff > map.png
+```
+Note that this command needs to be piped into a file with the `>` operator if used in terminal. In browser, it will download into a file and pop up on its own.
+Output:
+```
+ % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     100 1034k  100 1034k    0     0  47.5M      0 --:--:-- --:--:-- --:--:-- 48.0M
+```
+
+#### `/download_plot/<job_uuid>` - returns plot created by worker of error versus sensors for a given magnitude of earthquakes
+
+```
+$ curl <ip_address><port_number>/download_plot/<job_uuid>
+```
+
+Example:
+```
+$ curl <ip_address><port_number>/download_plot/7987e80f-b1f4-4983-bf53-2cfc33d0ffff > plot.png
+```
+Note that this command needs to be piped into a file with the `>` operator if used in terminal. In browser, it will download into a file and pop up on its own.
+Output:
+```
+ % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     100 1034k  100 1034k    0     0  47.5M      0 --:--:-- --:--:-- --:--:-- 48.0M
+```
+
+### Testing the interface
+To ensure that the API is creating jobs and returning routes as expected, use the test suite in the ```/test``` folder, under ```test_app.py```. This test provides 6 tests for the jobs, API, and worker. To run this test, simply run the following command below. This should not be run in the Kubernetes namespace.
+```
+$ pytest test/test_app.py
+```
+Output:
+```
+collected 6 items
+
+test/test_app.py ......                                                                                                                                              [100%]
+
+============================================================================ 6 passed in 39.56s ============================================================================
+```
+### Happy analyzing and querying!
