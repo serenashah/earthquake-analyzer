@@ -89,8 +89,8 @@ Output below explains how to download the data and lists of the routes:
 ```
 
 FIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
-    IF THERE ARE ERROR LOAD THE DATA ONCE MORE\n\n
-    Navigation:\n
+    IF THERE ARE ERROR LOAD THE DATA ONCE MORE
+    
     Use the following routes to access the data:
       1.  /help
           #explains navigation of the app
