@@ -115,7 +115,6 @@ FIRST LOAD DATA USING THE FOLLOWING PATH: /data -X POST\n
           #plots map of earthquake magnitudes and downloads as png
       12.  /download_plot/<job_uuid>
           #plots graph of earthquake magnitudes and downloads to local machine 
-
 ```
 
 #### `/load` - loads data from XML files
